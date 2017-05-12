@@ -1,0 +1,3 @@
+classes:
+- cluster.mcp_oc.openstack.compute
+- system.opencontrail.compute.dpdk

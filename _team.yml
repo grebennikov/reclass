@@ -1,0 +1,28 @@
+parameters:
+  linux:
+    system:
+      user:
+        user1:
+          enabled: true
+          name: user1
+          sudo: true
+          full_name: user1
+          home: /home/user1
+          email: user1@mira.com
+      group:
+        libvirtd:
+          enabled: true
+          name: libvirtd
+  openssh:
+    server:
+      enabled: true
+      user:
+        user1:
+          enabled: true
+          public_keys:
+          - ${public_keys:user1}
+          user: ${linux:system:user:user1}
+  public_keys:
+    user1:
+      key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC6uHB/c1xvnqKNLKV3UzpatiaKg1/iZOMLNEKnxHW3XUPpDJJzFzxXQF8gr2H6xx1QyhLcRNAlNrNCekZecrXqhTjQmt4DO5YFhBgwTh9e96jDFI59kBm/opxoaibS9A8AdC2QFTzR98df8TJxAhgwgypDU/vz3IS0UL2cJoHOHVcnPrZxjU1TQGmXIsGlxF+Q5Pal6+CPuAqgiPC+dBGD+QL96v7ddoKdPm81/qhjKFREFxnmtpsDsZZY5gP3hIQUg13o+A3h6lGu/ayKrwxUP60gkvr9WqSWtA5MtB4Knoz8jOMVlwKz3RvU4eUfkqozwBifZfHM+WGP1MT+Vqzv
+

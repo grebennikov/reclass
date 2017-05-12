@@ -1,0 +1,135 @@
+
+classes:
+  - system.linux.system.haveged
+ #- system.glusterfs.server.volume.salt
+  - system.glusterfs.client.cluster
+  - system.glusterfs.client.volume.aptly
+  - system.glusterfs.client.volume.gerrit
+  - system.glusterfs.client.volume.jenkins
+  - system.glusterfs.client.volume.mysql
+  - system.glusterfs.client.volume.registry
+ #- system.glusterfs.client.volume.salt
+  # Docker
+  - system.docker.host
+  # Docker services
+#  - system.docker.swarm.service.aptly
+#  - system.docker.swarm.service.docker
+#  - system.docker.swarm.service.gerrit
+#  - system.docker.swarm.service.jenkins
+  - system.docker.swarm.service.mysql
+  # - system.docker.swarm.service.openldap
+#  - system.docker.swarm.service.visualizer
+  - system.docker.swarm.stack.aptly
+  - system.docker.swarm.stack.docker
+  - system.docker.swarm.stack.gerrit
+  - system.docker.swarm.stack.jenkins
+#  - system.docker.swarm.stack.ldap
+
+  # Keepalived
+  - system.keepalived.cluster.instance.cicd_control_vip
+
+  # HAProxy
+  - system.salt.minion.cert.proxy.cicd
+  - system.haproxy.proxy.single
+  - system.haproxy.proxy.listen.cicd.aptly
+  - system.haproxy.proxy.listen.cicd.gerrit
+  - system.haproxy.proxy.listen.cicd.jenkins
+  - system.haproxy.proxy.listen.docker.registry
+  - system.haproxy.proxy.listen.docker.visualizer
+  - system.haproxy.proxy.listen.mysql
+  - system.haproxy.proxy.listen.stats
+
+parameters:
+  _param:
+    cluster_node01_name: ${_param:cicd_control_node01_hostname}
+    cluster_node01_address: ${_param:cicd_control_node01_address}
+    cluster_node02_name: ${_param:cicd_control_node02_hostname}
+    cluster_node02_address: ${_param:cicd_control_node02_address}
+    cluster_node03_name: ${_param:cicd_control_node03_hostname}
+    cluster_node03_address: ${_param:cicd_control_node03_address}
+    keepalived_vip_virtual_router_id: 180
+    keepalived_vip_password: j13QUNz9hH82Y40y
+    keepalived_vip_interface: ens3
+    cluster_vip_address: ${_param:control_vip_address}
+    control_vip_address: ${_param:cicd_control_address}
+    cluster_public_host: ${_param:control_vip_address}
+    salt_api_password: "password" 
+    # Docker images and versions
+    docker_registry_http_secret: pIgoGBrbCrlkAuCZ
+    docker_image_gerrit: tcpcloud/gerrit:2.12.7
+    # CI/CD service databases
+    mysql_admin_password: i1upNMVsdAWTAMkc
+    mysql_gerrit_password: R2ONn5nEz1VjLNAn
+
+    # Proxy
+    cluster_ssl_certificate:
+      enabled: true
+      pem_file: /etc/haproxy/ssl/${_param:cluster_public_host}-all.pem
+    haproxy_bind_address: ${_param:cluster_vip_address}
+    haproxy_mysql_source_port: 13306
+    salt_minion_ca_host: ${_param:infra_config_hostname}.${_param:cluster_domain}
+
+    # Aptly
+    aptly_gpg_keypair_id: none
+    aptly_gpg_passphrase: none
+    aptly_server_secure: false
+    aptly_gpg_public_key: none
+    aptly_gpg_private_key: none
+
+    # Jenkins
+    jenkins_slave_user: admin
+    jenkins_client_user: admin
+    jenkins_admin_password: 1WD1QVwyUkAWrVLC
+    jenkins_slave_password: ${_param:jenkins_admin_password}
+    jenkins_client_password: ${_param:jenkins_admin_password}
+    jenkins_admin_email: ${_param:admin_email}
+    jenkins_admin_public_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDKjG46FyI7z0GWXUYyXBd+F+C8Rip7/CdQV5gPOEvkeyrIwWHym9s+n9SJ+oOHwXTjP976gNDiZDYBxSeNWC7rQD84OU9ZwQ/nvTL9FQVFFsNWq+jxHuST8veb2+58Fhf9OqzXO5hUm0VaP7sxs7dGwHBthggmiCUHaA9Vh4kT1yMHbyZpsSE35dbRaastNRf6jp4eY+5kC6R7hfnEN401ze2+oAWn4uw0JjPQpyzIaV7lA0HAppY36y3E3IsnHe0J3ml5p76uZ57WIJok2B40UKPLe06Hp8daX8Mn/K6Gf6fm7Da1A8XC/w9GlArhFr8GoENCUEXUbfcFKVDDMTij root@cfg01
+    jenkins_admin_private_key: |
+      -----BEGIN RSA PRIVATE KEY-----
+      MIIEpAIBAAKCAQEAyoxuOhciO89Bll1GMlwXfhfgvEYqe/wnUFeYDzhL5HsqyMFh
+      8pvbPp/UifqDh8F04z/e+oDQ4mQ2AcUnjVgu60A/ODlPWcEP570y/RUFRRbDVqvo
+      8R7kk/L3m9vufBYX/Tqs1zuYVJtFWj+7MbO3RsBwbYYIJoglB2gPVYeJE9cjB28m
+      abEhN+XW0WmrLTUX+o6eHmPuZAuke4X5xDeNNc3tvqAFp+LsNCYz0KcsyGle5QNB
+      wKaWN+stxNyLJx3tCd5peae+rmee1iCaJNgeNFCjy3tOh6fHWl/DJ/yuhn+n5uw2
+      tQPFwv8PRpQK4Ra/BqBDQlBF1G33BSlQwzE4owIDAQABAoIBAD7JFyYEo8T8cu1E
+      To0vxMx+ZFiYO3UhbaJW9LjLD6Nslo+SemU08NpRuxVmRT1gt3X2B42JPrber2sP
+      DTqgOjMMQEySX0mIMgD4wgR3bqHC85w7P8L2e45tA1oZ66wlQRxrAsbZH1gipXXb
+      SZCXj9lrr64TnRUsoKXSGOa/U7uFKJU48fl95M9/wLr3LtLPP9kUOzgoCYqUJJ7g
+      VgoLUuyzOGyrK82VN5PIdbBx4KQVFE3WCjAmvacJEaqjsYF4fxT4KLJghSyvea4X
+      hoDqQuYAW7EpBFcK6kgOIrAfC4PP0y0VRearXattoKiqJANO4/C5LAyeFuLieawN
+      gDpF8TkCgYEA5izXtf6vnhKAGEtPcpAtAZTnDuiuCOXRMv+8Nplw6jZPrthTWFpA
+      Y5ujNR9tXcVCZyNXBnrt+tkxnGizFNE5xsGXRuCPPKQHiQffC8ypgK45TW57W6ej
+      KCUWDEMtDnrtdn8xSzHHfogvL5BCg7Jnz1FKtAuZ985koiodyxeji28CgYEA4UYW
+      qWJMxwNQ2RdmLFbw5HP+eyF05s74YjKZWS73uFUEk47c1R1VPxQU8JemcgA+qpk0
+      d2EUdj+toBUPQwhan0OC7wApL3kFaZ+3T05bGd9Rv9GkqC9hFntijiZa3TCKJ0Ma
+      vf8klUYJRdGT/hjovIabOTk7DjW0FnV2QOgNHA0CgYEA3uewYuxpUFCkQmK0ZsLf
+      Avgbp2GIIM/G/3eP4uRH6Fl+Y1nVpOuKDayMqoZr2HKOsukTfxAPZW1u0QTH4LIa
+      HLQf9yDDNju3nGnGBFxIDnkqvyTuS72VkOwRZQCtIqfDTY0xxJtJkez6nTo8X+On
+      Cqu0B5Zwnf3/kNfukF6tH/sCgYEAwTQKVYVgEcLvQPEHiPmbqmMtG09LYnSZpCZ/
+      THSysl4ACcmZ7hE1Pl8rwlhdwSIinM++prAVC4F7mHLXXwc4KaWOEwqRSAzELp1z
+      asnp6huUki3ryO6xlsWFdiLBBTkPE7NCqTa8mmWxqDahdWjJmn7be81wr7QxWp2t
+      KOeb7rUCgYA87H28I+PaLDjH9FkjLLfiXqRC9cxTKCxTUs6h5JI4cy/Eq3bNSl9A
+      INmJ40Rgx/4wodcD9XqTtTLTUSMNITLWNJApd5EjB0/sSznA2/RFYIn92etWoXws
+      stble8XNXN+RyF6OWuAbGvhnRQ9twDRucUAIlABzL62jKxPHedTCTA==
+      -----END RSA PRIVATE KEY-----
+    # Jobs params
+    jenkins_gerrit_url: ssh://admin@${_param:gerrit_public_host}:${_param:haproxy_gerrit_ssh_bind_port}
+    jenkins_aptly_api_url: http://${_param:haproxy_aptly_api_bind_host}:${_param:haproxy_aptly_api_bind_port}
+    jenkins_aptly_url: http://${_param:haproxy_aptly_public_bind_host}:${_param:haproxy_aptly_public_bind_port}
+    # Gerrit
+
+    gerrit_admin_email: ${_param:admin_email}
+    gerrit_public_host: ${_param:control_vip_address}
+    gerrit_admin_public_key: ${_param:jenkins_admin_public_key}
+    gerrit_admin_private_key: ${_param:jenkins_admin_private_key}
+    gerrit_admin_password: XRKOe6nKtzGkW4a7
+    gerrit_auth_type: DEVELOPMENT_BECOME_ANY_ACCOUNT
+
+  linux:
+    system:
+      package:
+        ca-certificates-java:
+          version: latest
+    network:
+      interface:
+        ens3: ${_param:linux_single_interface}
